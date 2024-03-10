@@ -1,0 +1,18 @@
+{% extends "home.html" %}
+{% load static %}
+{% block title %}Login{% endblock %}
+{% block content %}
+  <form class="login-form" method="POST">
+    {% csrf_token %}
+    <img src="{% static 'img/logo.png' %}">
+    <div class="material-textfield m2" dir="ltr">
+      <input placeholder=" " type="text" name="jobNum" required>
+      <label>الرقم الوظيفي</label>
+    </div>
+    <div class="material-textfield m2" dir="ltr">
+      <input placeholder=" " type="password" name="password" required>
+      <label>كلمة المرور</label>
+    </div>
+    <button class="btn primary">تسجيل الدخول</button>
+  </form>
+{% endblock %}

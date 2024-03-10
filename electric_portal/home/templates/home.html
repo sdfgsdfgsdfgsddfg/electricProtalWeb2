@@ -1,0 +1,360 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}Electric portal{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style/min.style.css' %}">
+    <link rel="stylesheet" href="{% static 'style/style.css' %}">
+
+    <meta name = “theme-color” content = “#cccccc”>
+    <meta name = "msapplication-navbutton-color" content = "#cccccc">
+    <meta name = "apple-mobile-web-app-capable" content = "#cccccc">
+    <meta name = "apple-mobile-web-app-status-bar-style" content = "#cccccc">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+  </head>
+  <body>
+    {% block content %}
+    <nav>
+      <button class="btn ibtn" id="menu"><span class="material-symbols-sharp">menu</span></button>
+      <span>العنوان</span>
+      <div class="more-buttons">
+        <button id="searchBtn" class="btn ibtn"><span class="material-symbols-sharp">search</span></button>
+      </div>
+      <div class="search-group">
+        <input id="searchInput" type="text" placeholder="البحث">
+        <button class="btn ibtn close-search"><span class="material-symbols-sharp">close</span></button>
+      </div>
+    </nav>
+    <button class="nd"></button>
+    <div class="search-box" id="searchBox">
+    </div>
+    <aside>
+      <div>
+        <div class="header">
+          <span style="width:70%;" class="long">{{user.consultant_name}}</span>
+          <p>مستشار</p>
+        </div>
+        <div class="items">
+          <button class="btn selected" id="home"><span class="material-symbols-sharp">home</span><p>الصفحة الرئيسية</p></button>
+          <button class="btn" id="addAssay"><span class="material-symbols-sharp">sticky_note_2</span><p>إضافة مقايسة</p></button>
+          {% if user.user_role == "manager" %}<button class="btn" id="consultants" onclick="location.href='/consultants'"><span class="material-symbols-sharp">groups</span><p>الإستشاريين</p></button>{% endif %}
+          <button class="btn" id="settings"><span class="material-symbols-sharp">settings</span><p>الضبط</p></button>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <div class="content">
+        <p class="content-header">المقايسات</p>
+        <div class="list" id="assaysList">
+          {% for d in data %}<p class="list-header">{{d.0}}</p>
+          {% for f in d.1 %}<button data-assay="{{f.0}}" class="btn"><p>{{f.0}}</p><div>{{f.1}}</div><span>{{f.2}}</span></button>
+          {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      <form method="POST" data-form class="add-assay" id="addAssayForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="add-assay-header">
+          <button type="button" class="btn ibtn back-btn"><span class="material-symbols-sharp">close</span></button>
+          <p class="content-header2">إضافة مقايسة</p>
+        </div>
+        <div class="add-assay-content">
+          <p class="form-header">نوع الطلب</p>
+          <div style="float:right;width:100%;">
+            <label class="pure-material-radio m2">
+              <input type="radio" name="group" id="new" checked>
+              <span>جديد</span>
+            </label>
+            <label class="pure-material-radio m2">
+              <input type="radio" name="group" id="temp">
+              <span>مؤقت</span>
+            </label>
+            <input type="hidden" name="checkType" id="checkType" value="new">
+          </div>
+          <br>
+          <br>
+          <br>
+          <br>
+          <p class="form-header">البيانات الأساسية</p>
+          <div class="inputs">
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="assayNum" maxlength="50" required>
+              <label>المقايسة</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="missionNum" maxlength="50" required>
+              <label>المهمة</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="permitType" maxlength="50" required>
+              <label>التصريح</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="contractorName" maxlength="50" required>
+              <label>المقاول</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="station" maxlength="50" required>
+              <label>المحطة</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="neighborhood" maxlength="50" required>
+              <label>الحي</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="depthOfExcavation" maxlength="50" required>
+              <label>عمق الحفرية</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="fossilView" maxlength="50" required>
+              <label>عرض الحفرية</label>
+            </div>
+            <div class="material-textfield m2">
+              <input placeholder=" " type="text" name="cableLength" maxlength="50" required>
+              <label>طول الكابل</label>
+            </div>
+          </div>
+          <p class="form-header">الصور</p>
+          <div class="img-picker-group" id="permitsGroup">
+            <p class="img-picker-header">التصاريح</p>
+            <button data-for="permit" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="permit" accept="image/*" hidden>
+            <div class="selected-images" id="permits">
+            </div>
+          </div>
+          <div class="img-picker-group" id="teamModelsGroup">
+            <p class="img-picker-header">نموذج فريق العمل</p>
+            <button data-for="teamModel" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="teamModel" accept="image/*" hidden>
+            <div class="selected-images" id="teamModels">
+            </div>
+          </div>
+          <div class="img-picker-group" id="preWorkMeetingsGroup">
+            <p class="img-picker-header">إجتماع ما قبل العمل</p>
+            <button data-for="preWorkMeeting" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="preWorkMeeting" accept="image/*" hidden>
+            <div class="selected-images" id="preWorkMeetings">
+            </div>
+          </div>
+          <div class="img-picker-group" id="riskAssessmentsGroup">
+            <p class="img-picker-header">تقييم المخاطر</p>
+            <button data-for="riskAssessment" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="riskAssessment" accept="image/*" hidden>
+            <div class="selected-images" id="riskAssessments">
+            </div>
+          </div>
+          <div class="img-picker-group" id="safeWorkProceduresGroup">
+            <p class="img-picker-header">إجراءات العمل الآمن</p>
+            <button data-for="safeWorkProcedure" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="safeWorkProcedure" accept="image/*" hidden>
+            <div class="selected-images" id="safeWorkProcedures">
+            </div>
+          </div>
+          <div class="img-picker-group" id="paramedicsGroup">
+            <p class="img-picker-header">المسعف</p>
+            <button data-for="paramedic" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="paramedic" accept="image/*" hidden>
+            <div class="selected-images" id="paramedics">
+            </div>
+          </div>
+          <div class="img-picker-group" id="fightersGroup">
+            <p class="img-picker-header">المكافح</p>
+            <button data-for="fighter" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="fighter" accept="image/*" hidden>
+            <div class="selected-images" id="fighters">
+            </div>
+          </div>
+          <div class="img-picker-group" id="assignedTasksGroup">
+            <p class="img-picker-header">المهمة المسندة</p>
+            <button data-for="assignedTask" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="assignedTask" accept="image/*" hidden>
+            <div class="selected-images" id="assignedTasks">
+            </div>
+          </div>
+          <div class="img-picker-group" id="artificialSecurityCardsGroup">
+            <p class="img-picker-header">بطاقة الأمن الإصطناعي</p>
+            <button data-for="artificialSecurityCard" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="artificialSecurityCard" accept="image/*" hidden>
+            <div class="selected-images" id="artificialSecurityCards">
+            </div>
+          </div>
+          <div class="img-picker-group" id="recipientCardsGroup">
+            <p class="img-picker-header">بطاقة المستلم</p>
+            <button data-for="recipientCard" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="recipientCard" accept="image/*" hidden>
+            <div class="selected-images" id="recipientCards">
+            </div>
+          </div>
+          <div class="img-picker-group" id="sourceCardsGroup">
+            <p class="img-picker-header">بطاقة المصدر</p>
+            <button data-for="sourceCard" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="sourceCard" accept="image/*" hidden>
+            <div class="selected-images" id="sourceCards">
+            </div>
+          </div>
+          <div class="img-picker-group" id="tuvForEquipmentAndDriversGroup">
+            <p class="img-picker-header">للمعدات والسائق TUV</p>
+            <button data-for="tuvForEquipmentAndDriver" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="tuvForEquipmentAndDriver" accept="image/*" hidden>
+            <div class="selected-images" id="tuvForEquipmentAndDrivers">
+            </div>
+          </div>
+          <div class="img-picker-group" id="fireExtinguishersGroup">
+            <p class="img-picker-header">طفاية الحريق</p>
+            <button data-for="fireExtinguisher" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="fireExtinguisher" accept="image/*" hidden>
+            <div class="selected-images" id="fireExtinguishers">
+            </div>
+          </div>
+          <div class="img-picker-group" id="firstAidsGroup">
+            <p class="img-picker-header">الإسعافات الأولية</p>
+            <button data-for="firstAid" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="firstAid" accept="image/*" hidden>
+            <div class="selected-images" id="firstAids">
+            </div>
+          </div>
+          <div class="img-picker-group" id="workTeamsGroup">
+            <p class="img-picker-header">فريق العمل</p>
+            <button data-for="workTeam" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="workTeam" accept="image/*" hidden>
+            <div class="selected-images" id="workTeams">
+            </div>
+          </div>
+          <div class="img-picker-group" id="picturesOfSitesGroup">
+            <p class="img-picker-header">صور للموقع</p>
+            <button data-for="picturesOfSite" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="picturesOfSite" accept="image/*" hidden>
+            <div class="selected-images" id="picturesOfSites">
+            </div>
+          </div>
+          <div class="img-picker-group" id="subscriptionNumbersGroup">
+            <p class="img-picker-header">رقم الإشتراك</p>
+            <button data-for="subscriptionNumber" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="subscriptionNumber" accept="image/*" hidden>
+            <div class="selected-images" id="subscriptionNumbers">
+            </div>
+          </div>
+          <div class="img-picker-group" id="cutterCapacitysGroup">
+            <p class="img-picker-header">سعة القاطع</p>
+            <button data-for="cutterCapacity" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="cutterCapacity" accept="image/*" hidden>
+            <div class="selected-images" id="cutterCapacitys">
+            </div>
+          </div>
+          <div class="img-picker-group" id="countersGroup">
+            <p class="img-picker-header">العداد</p>
+            <button data-for="counter" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="counter" accept="image/*" hidden>
+            <div class="selected-images" id="counters">
+            </div>
+          </div>
+          <div class="img-picker-group" id="missionLocksGroup">
+            <p class="img-picker-header">اقفال المهمة</p>
+            <button data-for="missionLock" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="missionLock" accept="image/*" hidden>
+            <div class="selected-images" id="missionLocks">
+            </div>
+          </div>
+          <div class="img-picker-group" id="safetyBarriersGroup">
+            <p class="img-picker-header">الحواجز</p>
+            <button data-for="safetyBarrier" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="safetyBarrier" accept="image/*" hidden>
+            <div class="selected-images" id="safetyBarriers">
+            </div>
+          </div>
+          <div class="img-picker-group" id="objectsGroup">
+            <p class="img-picker-header">النماذج</p>
+            <button data-for="object" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="object" accept="image/*" hidden>
+            <div class="selected-images" id="objects">
+            </div>
+          </div>
+          <div class="img-picker-group" id="obstaclesGroup">
+            <p class="img-picker-header">العوائق</p>
+            <button data-for="obstacle" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="obstacle" accept="image/*" hidden>
+            <div class="selected-images" id="obstacles">
+            </div>
+          </div>
+          <div class="img-picker-group" id="violationsGroup">
+            <p class="img-picker-header">المخالفات</p>
+            <button data-for="violation" type="button" class="btn"><span class="material-symbols-sharp">add</span>إختيار صورة</button>
+            <input type="file" id="violation" accept="image/*" hidden>
+            <div class="selected-images" id="violations">
+            </div>
+          </div>
+          <div class="inputs">
+            <button class="primary btn" type="submit">حفظ</button>
+            <br>
+            <br>
+          </div>
+        </div>
+      </form>
+      <div class="add-assay" id="assayForm">
+        <div class="add-assay-header">
+          <button class="btn ibtn back-btn"><span class="material-symbols-sharp">close</span></button>
+          <p class="content-header2" id="assayNum" style="margin-top:20px;"></p>
+        </div>
+        <div class="add-assay-content">
+          <br>
+          <p class="form-header">نوع الطلب</p>
+          <p class="text" id="orderType"></p>
+          <br>
+          <p class="form-header">المهمة</p>
+          <p class="text" id="missionNumber"></p>
+          <br>
+          <p class="form-header">التصريح</p>
+          <p class="text" id="perType"></p>
+          <br>
+          <p class="form-header">المقاول</p>
+          <p class="text" id="conName"></p>
+          <br>
+          <p class="form-header">المحطة</p>
+          <p class="text" id="station"></p>
+          <br>
+          <p class="form-header">الحي</p>
+          <p class="text" id="neighborhood"></p>
+          <br>
+          <p class="form-header">عمق الحفرية</p>
+          <p class="text" id="depthOfExcavation"></p>
+          <br>
+          <p class="form-header">عرض الحفرية</p>
+          <p class="text" id="fossilView"></p>
+          <br>
+          <p class="form-header">طول الكابل</p>
+          <p class="text" id="cableLength"></p>
+          <div class="image-card" id="imagesCard">
+          </div>
+        </div>
+      </div>
+      <div class="add-assay" id="settingsForm">
+        <div class="add-assay-header">
+          <button class="btn ibtn back-btn"><span class="material-symbols-sharp">close</span></button>
+          <p class="content-header2" style="margin-top:20px;">الضبط</p>
+        </div>
+        <div class="add-assay-content">
+          <button class="outline btn" onclick="location.href='logout';">تسجيل الخروج</button>
+        </div>
+      </div>
+    </main>
+    {% endblock %}
+    <div id="snackbar" class="snackbar"><p id="snackbarText"></p></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+    document.body.style.display = 'none';
+  });
+  window.addEventListener('load', function() {
+    document.body.style.display = 'block';
+  });
+      </script>
+    <script src="{% static 'script/jQuery.js' %}"></script>
+    <script src="{% static 'script/script.js' %}"></script>
+    <script src="{% static 'script/jq.js' %}"></script>
+  </body>
+</html>
